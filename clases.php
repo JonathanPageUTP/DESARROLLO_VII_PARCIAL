@@ -1,6 +1,10 @@
 <?php
 // Archivo: clases.php
+interface Inventariable{
 
+    public function obtenerInformacionInventario(): string;
+
+}
 class Producto {
     public $id;
     public $nombre;
