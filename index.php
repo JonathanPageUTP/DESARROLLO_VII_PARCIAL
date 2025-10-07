@@ -28,35 +28,111 @@ $campoOrden = $_GET['ordenar'] ?? 'id';
 $tipoOrden = $_GET['tipo'] ?? 'asc';
 $filtroEstado = $_GET['estado'] ?? '';
 
-// Procesar las diferentes operaciones
+/* Procesar las diferentes operaciones*/
+//Operación 'crear': Crear el objeto producto según la categoría y agregarlo usando el gestor
 if ($operacion === 'crear' && !empty($_GET['nombre'])) {
+    $datosProducto = [
+        'id' => time(),
+        'nombre' => $_GET['nombre'],
+        'descripcion' => $_GET['descripcion'] ?? '',
+        'estado' => $_GET['estado'] ?? 'disponible',
+        'stock' => (int)($_GET['stock'] ?? 0),
+        'fechaIngreso' => date('Y-m-d'),
+        'categoria' => $_GET['categoria'] ?? ''
+    ];
+    // Añadir campos específicos según la categoría
+    switch ($datosProducto['categoria']) {
+        case 'electronico':
+            $datosProducto['garantiaMeses'] = (int)($_GET['garantiaMeses'] ?? 0);
+            break;
+        case 'alimento':
+            $datosProducto['fechaVencimiento'] = $_GET['fechaVencimiento'] ?? '';
+            break;
+        case 'ropa':
+            $datosProducto['talla'] = $_GET['talla'] ?? '';
+            break;
+    }
+    $nuevoProducto = new Producto($datosProducto);
+    $gestor->agregar($nuevoProducto);
     $notificacion = "Producto agregado correctamente.";
-    
-} elseif ($operacion === 'modificar' && !empty($_GET['id'])) {
-    $notificacion = "Producto modificado correctamente.";
-    
-} elseif ($operacion === 'eliminar' && !empty($_GET['id'])) {
-    $notificacion = "Producto eliminado correctamente.";
-    
-} elseif ($operacion === 'cambiar_estado' && !empty($_GET['id']) && !empty($_GET['nuevo_estado'])) {
-    $notificacion = "Estado actualizado correctamente.";
-    
-} elseif ($operacion === 'editar' && !empty($_GET['id'])) {
+//Operación 'modificar': Actualizar el producto existente con los nuevos datos
 
+} else if ($operacion === 'modificar' && !empty($_GET['id'])) {
+    $productoExistente = $gestor->obtenerPorId((int)$_GET['id']);
+    if ($productoExistente) {
+        $productoExistente->nombre = $_GET['nombre'] ?? $productoExistente->nombre;
+        $productoExistente->descripcion = $_GET['descripcion'] ?? $productoExistente->descripcion;
+        $productoExistente->estado = $_GET['estado'] ?? $productoExistente->estado;
+        $productoExistente->stock = (int)($_GET['stock'] ?? $productoExistente->stock);
+        $productoExistente->categoria = $_GET['categoria'] ?? $productoExistente->categoria;
+
+        // Actualizar campos específicos según la categoría
+        switch ($productoExistente->categoria) {
+            case 'electronico':
+                $productoExistente->garantiaMeses = (int)($_GET['garantiaMeses'] ?? $productoExistente->garantiaMeses);
+                break;
+            case 'alimento':
+                $productoExistente->fechaVencimiento = $_GET['fechaVencimiento'] ?? $productoExistente->fechaVencimiento;
+                break;
+            case 'ropa':
+                $productoExistente->talla = $_GET['talla'] ?? $productoExistente->talla;
+                break;
+        }
+
+        $gestor->actualizar($productoExistente);
+        $notificacion = "Producto actualizado correctamente.";
+    } else {
+        $notificacion = "Producto no encontrado.";
+    }
+//Operación 'eliminar': Eliminar el producto por su ID  
+} else if ($operacion === 'eliminar' && !empty($_GET['id'])) {
+    $eliminado = $gestor->eliminar((int)$_GET['id']);
+    if ($eliminado) {
+        $notificacion = "Producto eliminado correctamente.";
+    } else {
+        $notificacion = "Producto no encontrado.";
+    }
+//Operación 'cambiar_estado': Cambiar solo el estado del producto 
+} elseif ($operacion === 'cambiar_estado' && !empty($_GET['id']) && !empty($_GET['nuevo_estado'])) {
+    $productoParaEstado = $gestor->obtenerPorId((int)$_GET['id']);
+    if ($productoParaEstado) {
+        $productoParaEstado->estado = $_GET['nuevo_estado'];
+        $gestor->actualizar($productoParaEstado);
+        $notificacion = "Estado del producto actualizado a '{$_GET['nuevo_estado']}'.";
+    } else {
+        $notificacion = "Producto no encontrado.";
+    }
+//Operación 'editar': Obtener el producto por ID y asignarlo a $itemParaEditar     
+} elseif ($operacion === 'editar' && !empty($_GET['id'])) {
+    $itemParaEditar = $gestor->obtenerPorId((int)$_GET['id']);
+    if (!$itemParaEditar) {
+        $notificacion = "Producto no encontrado.";
+    }
 }
 
-// Obtener productos (con o sin filtro)
-if ($operacion === 'filtrar' && !empty($filtroEstado)) {
-    $listaProductos = $gestor->obtenerTodos(); // Temporal, cambiar por filtro
-} else {
-    $listaProductos = $gestor->obtenerTodos();
+// Obtener productos (con o sin filtro) segun el estado
+$listaProductos = $gestor->obtenerTodos();
+if (!empty($filtroEstado)) {
+    $listaProductos = array_filter($listaProductos, function($item) use ($filtroEstado) {
+        return $item->estado === $filtroEstado;
+    });
+}else{
+    $filtroEstado = '';
 }
 
 // Ordenar productos
 if ($operacion === 'ordenar') {
+    usort($listaProductos, function($a, $b) use ($campoOrden, $tipoOrden) {
+        $valorA = $a->$campoOrden;
+        $valorB = $b->$campoOrden;
 
+        if ($tipoOrden === 'asc') {
+            return $valorA <=> $valorB;
+        } else {
+            return $valorB <=> $valorA;
+        }
+    });
 }
-
 ?>
 <!DOCTYPE html>
 <html lang="es">
