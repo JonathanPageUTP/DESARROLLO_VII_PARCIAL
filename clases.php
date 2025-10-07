@@ -34,35 +34,47 @@ abstract class Producto {
    public function getfechaIngreso () {return $this -> fechaIngreso;}
    public function getCategoria () {return $this -> categoria;}
 
-   abstract public function obtenerInformacionInventario(): string;
+   abstract function obtenerInformacionInventario(): string;
 }
 
 
 //Creación de las clases que heredan la clases Producto
-class ProductoElectronico extends Producto{
+class ProductoElectronico extends Producto implements Inventariable{
     public $garantiaMeses;
 
     public function __construct($datos) {
         parent::__construct($datos);
         $this->garantiaMeses = $datos['garantiaMeses'];
     }
+
+    public function obtenerInformacionInventario(): string{
+        return "El tiempo de garantía del es: " . $this->garantiaMeses;    
+    }
 }
 
-class ProductoAlimento extends Producto{
+class ProductoAlimento extends Producto implements Inventariable{
     public $fechaVencimiento;
 
     public function __construct($datos) {
         parent::__construct($datos);
         $this->fechaVencimiento = $datos['fechaVencimiento'];
     }
+
+    public function obtenerInformacionInventario(): string{
+        return "La fecha de vencimieno del producto: " .$this->fechaVencimiento;
+    }
 }
 
-class ProductoRopa extends Producto{
+class ProductoRopa extends Producto implements Inventariable{
     public $talla;
 
     public function __construct($datos) {
         parent::__construct($datos);
         $this->talla = $datos['talla'];
+    }
+
+    public function obtenerInformacionInventario(): string{
+        return "La talla del producto: ". $this->talla;
     }
 }
 
