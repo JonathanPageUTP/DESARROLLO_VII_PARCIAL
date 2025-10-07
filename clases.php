@@ -91,7 +91,24 @@ class GestorInventario {
 
     private function cargarDesdeArchivo() {
         if (!file_exists($this->rutaArchivo)) {
-            return;
+            $json = file_get_contents('productos.json');
+            $data = json_decode($json, true);
+
+            foreach($data as $productData){
+                switch($productData['categoria']){
+                    case 'Electronico':
+                        $this->items[] = new ProductoElectronico($productData);
+                        break;
+                    case 'Alimento':
+                        $this->items[] = new ProductoAlimento($productData);
+                        break;
+                    case 'Ropa':
+                        $this->items[] = new ProductoRopa($productData);
+                        break;
+                    }
+                
+            }
+            return $this->items;
         }
         
         $jsonContenido = file_get_contents($this->rutaArchivo);
