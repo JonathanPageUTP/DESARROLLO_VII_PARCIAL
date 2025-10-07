@@ -91,28 +91,27 @@ class GestorInventario {
 
     private function cargarDesdeArchivo() {
         if (!file_exists($this->rutaArchivo)) {
-            $json = file_get_contents('productos.json');
-            $data = json_decode($json, true);
-
-            foreach($data as $productData){
+           return;
+        }
+         $jsonContenido = file_get_contents($this->rutaArchivo);
+        $arrayDatos = json_decode($jsonContenido, true);
+            foreach($arrayDatos as $productData){
                 switch($productData['categoria']){
-                    case 'Electronico':
+                    case 'electronico':
                         $this->items[] = new ProductoElectronico($productData);
                         break;
-                    case 'Alimento':
+                    case 'alimento':
                         $this->items[] = new ProductoAlimento($productData);
                         break;
-                    case 'Ropa':
+                    case 'ropa':
                         $this->items[] = new ProductoRopa($productData);
                         break;
                     }
                 
             }
             return $this->items;
-        }
         
-        $jsonContenido = file_get_contents($this->rutaArchivo);
-        $arrayDatos = json_decode($jsonContenido, true);
+       
         
         if ($arrayDatos === null) {
             return;
