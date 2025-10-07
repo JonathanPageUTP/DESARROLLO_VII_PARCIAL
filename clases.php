@@ -1,7 +1,11 @@
 <?php
 // Archivo: clases.php
-interface Inventariable{
 
+
+
+//Creamos la interface Inventariable
+interface Inventariable{
+    //cremos el metodo obtenerInformacionInventario
     public function obtenerInformacionInventario(): string;
 
 }
@@ -20,6 +24,35 @@ class Producto {
                 $this->$clave = $valor;
             }
         }
+    }
+}
+
+
+//Creación de las clases que heredan la clases Producto
+class ProductoElectronico extends Producto{
+    public $garantiaMeses;
+
+    public function __construct($datos) {
+        parent::__construct($datos);
+        $this->garantiaMeses = $datos['garantiaMeses'];
+    }
+}
+
+class ProductoAlimento extends Producto{
+    public $fechaVencimiento;
+
+    public function __construct($datos) {
+        parent::__construct($datos);
+        $this->fechaVencimiento = $datos['fechaVencimiento'];
+    }
+}
+
+class ProductoRopa extends Producto{
+    public $talla;
+
+    public function __construct($datos) {
+        parent::__construct($datos);
+        $this->talla = $datos['talla'];
     }
 }
 
