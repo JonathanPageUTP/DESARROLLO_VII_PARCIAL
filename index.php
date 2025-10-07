@@ -9,6 +9,19 @@ $gestor = new GestorInventario();
 $notificacion = '';
 $itemParaEditar = null;
 
+$estadoLegible = [
+    'disponible' =>  'Disponible',
+    "agotado" => "Agotado",
+    "por_recibir" => "Por recibir"
+];
+
+$categoriasLegibles = [
+    'electronico' =>  'Electrónico',
+    "alimento" => "Alimento",
+    "ropa" => "Ropa"
+];
+
+
 // Capturar parámetros de la URL
 $operacion = $_GET['operacion'] ?? 'listar';
 $campoOrden = $_GET['ordenar'] ?? 'id';
