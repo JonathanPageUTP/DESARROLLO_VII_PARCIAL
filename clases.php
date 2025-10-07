@@ -5,7 +5,7 @@ interface Inventariable{
     public function obtenerInformacionInventario(): string;
 
 }
-class Producto {
+abstract class Producto {
     public $id;
     public $nombre;
     public $descripcion;
@@ -21,6 +21,16 @@ class Producto {
             }
         }
     }
+
+    public function getId () {return $this -> id;}
+   public function getNombre () {return $this -> nombre;}
+   public function getDescripcion () {return $this -> descripcion;}
+   public function getEstado () {return $this -> estado;}
+   public function getStock () {return $this -> stock;}
+   public function getfechaIngreso () {return $this -> fechaIngreso;}
+   public function getCategoria () {return $this -> categoria;}
+
+   abstract public function obtenerInformacionInventario(): string;
 }
 
 class GestorInventario {
